@@ -14,8 +14,9 @@ const eslintConfig = [
   {
     rules: {
       'semi': ['error', 'never'],
+      'comma-dangle': ['error', 'always-multiline'],
     },
   },
 ]
 
-export default eslintConfig;
+export default eslintConfig
