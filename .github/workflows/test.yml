@@ -10,9 +10,7 @@ on:
     branches: [ "main" ]
     # Do not run for drafts.
     types:
-      - opened
-      - synchronize
-      - reopened
+      - review_requested
       - ready_for_review
 
 jobs:
