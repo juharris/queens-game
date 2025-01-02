@@ -4,11 +4,17 @@ export enum CellValue {
     Queen = 2,
 }
 
-export interface Cell {
-    color: number
-    value: number
+export class Cell {
+    constructor(
+        public color: number,
+        public value: CellValue = CellValue.Blank,
+    ) {
+    }
 }
 
 export class Board {
-    constructor(public cells: Cell[][]) { }
+    constructor(
+        public cells: Cell[][],
+    ) {
+    }
 }
