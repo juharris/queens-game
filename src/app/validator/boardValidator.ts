@@ -10,7 +10,7 @@ export class BoardValidator {
         }
 
         const dfs = (i: number, j: number, color: number) => {
-            if (i < 0 || i >= size || j < 0 || j >= size || isInBlob[i][j] && board.cells[i][j].color !== color) {
+            if (i < 0 || i >= size || j < 0 || j >= size || isInBlob[i][j] || board.cells[i][j].color !== color) {
                 return
             }
 
