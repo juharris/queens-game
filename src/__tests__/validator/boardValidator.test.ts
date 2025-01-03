@@ -1,33 +1,50 @@
 import { Board, Cell } from '../../app/board'
 import { BoardValidator, InvalidBoardReason } from '../../app/validator/boardValidator'
 
-describe('BoardValidator', () => {
-    describe('areBlobsConnected', () => {
-        it('should return true when all same-colored cells are connected', () => {
+describe("BoardValidator", () => {
+    describe("areBlobsConnected", () => {
+        it("should return blobs when all same-colored cells are connected", () => {
             const board = new Board([
                 [new Cell(0), new Cell(0), new Cell(1)],
                 [new Cell(2), new Cell(0), new Cell(1)],
                 [new Cell(2), new Cell(2), new Cell(2)],
             ])
-            expect(BoardValidator.areBlobsConnected(board)).toBe(true)
+            const blobs = BoardValidator.areBlobsConnected(board)
+            expect(blobs).toBeDefined()
+            expect(blobs!.blobsByColor).toStrictEqual([
+                new Set(['0,0', '0,1', '1,1']),
+                new Set(['0,2', '1,2']),
+                new Set(['1,0', '2,0', '2,1', '2,2']),
+            ])
             expect(BoardValidator.isBoardValid(board).invalidReason).toBeUndefined()
 
         })
 
-        it('should return false when same-colored cells are disconnected', () => {
+        it("should return undefined with connected blobs, but not enough colors", () => {
+            const board = new Board([
+                [new Cell(0), new Cell(0), new Cell(1)],
+                [new Cell(1), new Cell(0), new Cell(1)],
+                [new Cell(1), new Cell(1), new Cell(1)],
+            ])
+            const blobs = BoardValidator.areBlobsConnected(board)
+            expect(blobs).toBeUndefined()
+            expect(BoardValidator.isBoardValid(board).invalidReason).toBe(InvalidBoardReason.NotEnoughColors)
+        })
+
+        it("should return undefined when same-colored cells are disconnected", () => {
             const board = new Board([
                 [new Cell(0), new Cell(1), new Cell(1), new Cell(0)],
                 [new Cell(1), new Cell(2), new Cell(2), new Cell(1)],
                 [new Cell(1), new Cell(2), new Cell(2), new Cell(1)],
                 [new Cell(0), new Cell(1), new Cell(1), new Cell(3)],
             ])
-            expect(BoardValidator.areBlobsConnected(board)).toBe(false)
+            expect(BoardValidator.areBlobsConnected(board)).toBeUndefined()
             expect(BoardValidator.isBoardValid(board).invalidReason).toBe(InvalidBoardReason.DisconnectedBlobs)
         })
     })
 
-    describe('hasEnoughColors', () => {
-        it('should return true when each row has enough unique colors', () => {
+    describe("hasEnoughColors", () => {
+        it("should return true when each row has enough unique colors", () => {
             const board = new Board([
                 [new Cell(0), new Cell(1), new Cell(2)],
                 [new Cell(1), new Cell(2), new Cell(0)],
@@ -38,7 +55,7 @@ describe('BoardValidator', () => {
             expect(BoardValidator.isBoardValid(board).invalidReason).toBe(InvalidBoardReason.DisconnectedBlobs)
         })
 
-        it('should return false when rows do not have enough unique colors', () => {
+        it("should return false when rows do not have enough unique colors", () => {
             const board = new Board([
                 [new Cell(0), new Cell(0), new Cell(0)],
                 [new Cell(1), new Cell(1), new Cell(1)],
