@@ -16,7 +16,7 @@ describe("BoardValidator", () => {
                 new Set(['0,2', '1,2']),
                 new Set(['1,0', '2,0', '2,1', '2,2']),
             ])
-            expect(BoardValidator.isBoardValid(board).invalidReason).toBeUndefined()
+            expect(BoardValidator.isBoardValid(board).invalidReason).toBe(InvalidBoardReason.NoUniqueSolution)
 
         })
 

@@ -1,13 +1,16 @@
 import { Board } from '../board'
+import { BoardSolution, BruteSolver } from '../solver'
 
 export enum InvalidBoardReason {
-    NotEnoughColors = "Board does not have enough unique colors.",
     DisconnectedBlobs = "Same-colored cells are disconnected.",
+    NotEnoughColors = "Board does not have enough unique colors.",
+    NoUniqueSolution = "No unique solution.",
 }
 
 export class BoardValidatorResponse {
     constructor(
         public invalidReason: InvalidBoardReason | undefined = undefined,
+        public solution: BoardSolution | undefined = undefined,
     ) { }
 }
 
@@ -18,6 +21,8 @@ export class ConnectBlobsResponse {
 }
 
 export class BoardValidator {
+    private static readonly bruteSolver = new BruteSolver()
+
     static areBlobsConnected(board: Board): ConnectBlobsResponse | undefined {
         const size = board.cells.length
         const traversedColors = new Set<number>()
@@ -98,7 +103,11 @@ export class BoardValidator {
             return new BoardValidatorResponse(InvalidBoardReason.DisconnectedBlobs)
         }
 
-        // TODO Ensure that the game is deterministically solvable.
-        return new BoardValidatorResponse()
+        const solution = BoardValidator.bruteSolver.findUniqueSolution(board, blobs)
+        if (solution === undefined) {
+            return new BoardValidatorResponse(InvalidBoardReason.NoUniqueSolution)
+        }
+
+        return new BoardValidatorResponse(undefined, solution)
     }
 }
