@@ -1,3 +1,8 @@
+export { getCell } from './board'
+
+/** Comma separated numbers. */
+export type CellPosition = string
+
 export enum CellValue {
     Blank = 0,
     NotQueen = 1,
@@ -8,6 +13,7 @@ export class Cell {
     constructor(
         public color: number,
         public value: CellValue = CellValue.Blank,
+        public position: number[] | undefined = undefined,
     ) {
     }
 }

@@ -1,4 +1,4 @@
-import { Board } from '../board'
+import { Board, CellPosition } from '../board'
 import { BoardSolution, BruteSolver } from '../solver'
 
 export enum InvalidBoardReason {
@@ -16,7 +16,7 @@ export class BoardValidatorResponse {
 
 export class ConnectBlobsResponse {
     constructor(
-        public blobsByColor: Set<string>[],
+        public blobsByColor: Set<CellPosition>[],
     ) { }
 }
 
@@ -26,16 +26,16 @@ export class BoardValidator {
     static areBlobsConnected(board: Board): ConnectBlobsResponse | undefined {
         const size = board.cells.length
         const traversedColors = new Set<number>()
-        const blobsByColor: Set<string>[] = []
+        const blobsByColor: Set<CellPosition>[] = []
         for (let i = 0; i < size; ++i) {
-            blobsByColor.push(new Set<string>())
+            blobsByColor.push(new Set<CellPosition>())
         }
         const isInBlob: boolean[][] = []
         for (let i = 0; i < size; ++i) {
             isInBlob.push(new Array(size).fill(false))
         }
 
-        const dfs = (i: number, j: number, color: number, blob: Set<string>): void => {
+        const dfs = (i: number, j: number, color: number, blob: Set<CellPosition>): void => {
             if (i < 0 || i >= size || j < 0 || j >= size || isInBlob[i][j] || board.cells[i][j].color !== color) {
                 return
             }

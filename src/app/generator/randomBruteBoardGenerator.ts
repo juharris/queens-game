@@ -1,5 +1,5 @@
 import { BoardGenerator, BoardGeneratorResponse } from '.'
-import { Board, CellValue } from '../board'
+import { Board, Cell, CellValue } from '../board'
 import { BoardValidator } from '../validator'
 import { InvalidBoardReason } from '../validator/boardValidator'
 
@@ -13,10 +13,7 @@ export class RandomBruteBoardGenerator implements BoardGenerator {
                 // Randomly pick a color.
                 // Could try biasing to pick a nearby color to avoid boards with disconnected color blobs.
                 const color = Math.floor(Math.random() * size)
-                row.push({
-                    color,
-                    value: CellValue.Blank,
-                })
+                row.push(new Cell(color, CellValue.Blank, [i, j]))
             }
             cells.push(row)
         }
