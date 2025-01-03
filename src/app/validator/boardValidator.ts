@@ -1,5 +1,14 @@
 import { Board } from '../board'
 
+export enum InvalidBoardReason {
+    NotEnoughColors = "Board does not have enough unique colors.",
+    DisconnectedBlobs = "Same-colored cells are disconnected.",
+}
+
+export class BoardValidatorResponse {
+    constructor(public invalidReason: InvalidBoardReason | undefined = undefined) {}
+}
+
 export class BoardValidator {
     static areBlobsConnected(board: Board): boolean {
         const size = board.cells.length
@@ -37,7 +46,7 @@ export class BoardValidator {
             }
         }
 
-        return traversedColors.size === size        
+        return traversedColors.size === size
     }
 
     static hasEnoughColors(board: Board): boolean {
@@ -55,16 +64,21 @@ export class BoardValidator {
         return false
     }
 
-    public static isBoardValid(board: Board): boolean {
+    /**
+     * Determines if the board is valid.
+     * @param board A square board with at most `board.cells.length` unique colors.
+     * @returns `true` if the board is valid, `false` otherwise.
+     */
+    public static isBoardValid(board: Board): BoardValidatorResponse {
         if (!BoardValidator.hasEnoughColors(board)) {
-            return false
+            return new BoardValidatorResponse(InvalidBoardReason.NotEnoughColors)
         }
 
         if (!BoardValidator.areBlobsConnected(board)) {
-            return false
+            return new BoardValidatorResponse(InvalidBoardReason.DisconnectedBlobs)
         }
 
         // TODO Ensure that the game is deterministically solvable.
-        return true
+        return new BoardValidatorResponse()
     }
 }

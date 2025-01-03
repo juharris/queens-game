@@ -1,5 +1,5 @@
 import { Board, Cell } from '../../app/board'
-import { BoardValidator } from '../../app/validator/boardValidator'
+import { BoardValidator, InvalidBoardReason } from '../../app/validator/boardValidator'
 
 describe('BoardValidator', () => {
     describe('areBlobsConnected', () => {
@@ -10,7 +10,7 @@ describe('BoardValidator', () => {
                 [new Cell(2), new Cell(2), new Cell(2)],
             ])
             expect(BoardValidator.areBlobsConnected(board)).toBe(true)
-            expect(BoardValidator.isBoardValid(board)).toBe(false)
+            expect(BoardValidator.isBoardValid(board).invalidReason).toBeUndefined()
 
         })
 
@@ -19,10 +19,10 @@ describe('BoardValidator', () => {
                 [new Cell(0), new Cell(1), new Cell(1), new Cell(0)],
                 [new Cell(1), new Cell(2), new Cell(2), new Cell(1)],
                 [new Cell(1), new Cell(2), new Cell(2), new Cell(1)],
-                [new Cell(0), new Cell(1), new Cell(1), new Cell(0)],
+                [new Cell(0), new Cell(1), new Cell(1), new Cell(3)],
             ])
             expect(BoardValidator.areBlobsConnected(board)).toBe(false)
-            expect(BoardValidator.isBoardValid(board)).toBe(false)
+            expect(BoardValidator.isBoardValid(board).invalidReason).toBe(InvalidBoardReason.DisconnectedBlobs)
         })
     })
 
@@ -35,7 +35,7 @@ describe('BoardValidator', () => {
             ])
             expect(BoardValidator.hasEnoughColors(board)).toBe(true)
             // Blobs are not connected.
-            expect(BoardValidator.isBoardValid(board)).toBe(false)
+            expect(BoardValidator.isBoardValid(board).invalidReason).toBe(InvalidBoardReason.DisconnectedBlobs)
         })
 
         it('should return false when rows do not have enough unique colors', () => {
@@ -45,7 +45,7 @@ describe('BoardValidator', () => {
                 [new Cell(0), new Cell(1), new Cell(0)],
             ])
             expect(BoardValidator.hasEnoughColors(board)).toBe(false)
-            expect(BoardValidator.isBoardValid(board)).toBe(false)
+            expect(BoardValidator.isBoardValid(board).invalidReason).toBe(InvalidBoardReason.NotEnoughColors)
         })
     })
 })
