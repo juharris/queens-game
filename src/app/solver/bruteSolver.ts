@@ -8,7 +8,12 @@ export class BruteSolver {
      * @param board A square board with enough colors and properly connected blobs.
      */
     findUniqueSolution(board: Board, blobs: ConnectBlobsResponse): BoardSolution | undefined{
-        // TODO
+        // TODO Check if any blobs have only one open cell.
+        // Check if any rows have only one open cell.
+        // Check if any columns have only one open cell.
+        // Check if any blobs only have cells in one row.
+        // Check if any blobs only have cells in one column.
+        // Check if any blobs are only in some rows, then mark other cells as not having a queen.
         return undefined
     }
 }
