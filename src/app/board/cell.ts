@@ -14,4 +14,8 @@ export class Cell {
         public position: number[] | undefined = undefined,
     ) {
     }
+
+    getIndexablePosition(): CellPosition {
+        return this.position!.join(',')
+    }
 }

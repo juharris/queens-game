@@ -77,7 +77,7 @@ export class BruteSolver {
             unfilledBlobCells.push(new Set(blob))
         }
 
-        // Check if any blobs have only one open cell.
+        // Check if any blobs have only one available cell.
         for (const blob of unfilledBlobCells) {
             if (blob.size === 1) {
                 const position = blob.values().next().value!
@@ -85,12 +85,36 @@ export class BruteSolver {
                 BruteSolver.markAsQueen(cell, board, position, unfilledBlobCells)
             }
         }
-        // Check if any rows have only one open cell.
-        // Check if any columns have only one open cell.
+
+        // Check if any rows have only one available cell.
+        for (let row = 0; row < board.cells.length; ++row) {
+            const availableCells = board.cells[row].filter(cell => cell.value === CellValue.Blank)
+            if (availableCells.length === 1) {
+                const cell = availableCells[0]
+                BruteSolver.markAsQueen(cell, board, cell.getIndexablePosition(), unfilledBlobCells)
+            }
+            // TODO Check for just 2 or 3 cells sequentially and mark the adjacent cells as not having a queen.
+            if (availableCells.length === 2) {
+                const [cell1, cell2] = availableCells
+                if (Math.abs(cell1.position![1] - cell2.position![1]) === 1) {
+                    // The cells are adjacent.
+                    // TODO Mark the adjacent cells as not having a queen.
+                }
+            }
+
+            // Check if any columns have only one available cell.
+            for (let column = 0; column < board.cells[row].length; ++column) {
+                const availableCells = board.cells.map(row => row[column]).filter(cell => cell.value === CellValue.Blank)
+                if (availableCells.length === 1) {
+                    const cell = availableCells[0]
+                    BruteSolver.markAsQueen(cell, board, cell.getIndexablePosition(), unfilledBlobCells)
+                }
+                // TODO Check for just 2 or 3 cells sequentially and mark the adjacent cells as not having a queen.
+            }
+        }
+
         // Check if any blobs only have cells in one row.
         // Check if any blobs only have cells in one column.
-        // Check if any rows or columns have just 2 cells that can have a queen and mark the adjacent cells as not having a queen.
-        // Check if any rows or columns have just 3 cells that can have a queen and mark the adjacent middle cells as not having a queen.
         // Check if any blobs are only in some rows, then mark other cells as not having a queen.
         // TODO Get queens.
         return new BoardSolution([])
