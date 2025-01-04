@@ -1,26 +1,4 @@
-export { getCell } from './board'
+export { Board } from './board'
+export { Cell, CellValue } from './cell'
+export type { CellPosition } from './cell'
 
-/** Comma separated numbers. */
-export type CellPosition = string
-
-export enum CellValue {
-    Blank = 0,
-    NotQueen = 1,
-    Queen = 2,
-}
-
-export class Cell {
-    constructor(
-        public color: number,
-        public value: CellValue = CellValue.Blank,
-        public position: number[] | undefined = undefined,
-    ) {
-    }
-}
-
-export class Board {
-    constructor(
-        public cells: Cell[][],
-    ) {
-    }
-}

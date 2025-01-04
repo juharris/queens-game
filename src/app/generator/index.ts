@@ -4,6 +4,7 @@ import { InvalidBoardReason } from '../validator/boardValidator'
 export class BoardGeneratorResponse {
     constructor(
         public board: Board,
+        public numAttempts: number,
         public stats: Map<InvalidBoardReason, number> | undefined = undefined,
     ) {
     }

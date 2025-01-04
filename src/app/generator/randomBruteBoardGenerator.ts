@@ -28,7 +28,7 @@ export class RandomBruteBoardGenerator implements BoardGenerator {
             const board = RandomBruteBoardGenerator.generateRandomBoardCandidate(size)
             const reason = BoardValidator.isBoardValid(board).invalidReason
             if (reason === undefined) {
-                return new BoardGeneratorResponse(board, stats)
+                return new BoardGeneratorResponse(board, tryNumber, stats)
             } else {
                 stats.set(reason, (stats.get(reason) || 0) + 1)
             }

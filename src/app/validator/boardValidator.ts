@@ -103,11 +103,11 @@ export class BoardValidator {
             return new BoardValidatorResponse(InvalidBoardReason.DisconnectedBlobs)
         }
 
-        const solution = BoardValidator.bruteSolver.findUniqueSolution(board, blobs)
-        if (solution === undefined) {
+        try {
+            const solution = BoardValidator.bruteSolver.findUniqueSolution(board, blobs)
+            return new BoardValidatorResponse(undefined, solution)
+        } catch {
             return new BoardValidatorResponse(InvalidBoardReason.NoUniqueSolution)
         }
-
-        return new BoardValidatorResponse(undefined, solution)
     }
 }

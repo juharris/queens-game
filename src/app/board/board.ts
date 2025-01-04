@@ -1,10 +1,18 @@
-import { Board, Cell, CellPosition } from '.'
+import { Cell, CellPosition } from '.'
 
-export function getCell(board: Board, position: CellPosition): Cell {
-    const pos = position.split(',').map(Number)
-    const result = board.cells[pos[0]][pos[1]]
-    if (result.position === undefined) {
-        result.position = pos
+export class Board {
+    constructor(
+        public cells: Cell[][],
+    ) {
+        for (let row = 0; row < cells.length; ++row) {
+            for (let column = 0; column < cells[row].length; ++column) {
+                cells[row][column].position = [row, column]
+            }
+        }
     }
-    return result
+
+    public getCell(position: CellPosition): Cell {
+        const pos = position.split(',').map(Number)
+        return this.cells[pos[0]][pos[1]]
+    }
 }
