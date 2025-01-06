@@ -123,6 +123,7 @@ export class BruteSolver {
         // Check if any blobs only have cells in one column.
         // Check if any blobs are only in some rows/columns, then mark the other rows/columns cells as not having a queen in that blob.
         // Check for for cells adjacent to straight like blobs, then we don't need some checks above.
+        // Example: Check for cells outside of and inside of L-like blobs or T-like blobs.
         // TODO Get queens.
         return new BoardSolution([])
     }
