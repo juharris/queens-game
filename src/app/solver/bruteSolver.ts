@@ -11,11 +11,11 @@ export class BruteSolver {
     }
 
     private static markAsNotQueen(board: Board, position: CellPosition): void {
-        const cell = board.getCell(position)
+        const cell = board.getCellByPosition(position)
         BruteSolver.markCellAsNotQueen(cell)
     }
 
-    private static markAsQueen(cell: Cell, board: Board, position: CellPosition, unfilledBlobCells: Set<string>[]): void {
+    private static markAsQueen(cell: Cell, board: Board, position: CellPosition, unfilledBlobCells: ConnectBlobsResponse['blobsByColor']): void {
         if (cell.value === CellValue.NotQueen) {
             throw new Error(`The cell ${position} is already marked as not having a queen.`)
         }
@@ -23,8 +23,8 @@ export class BruteSolver {
         // Clear the blob.
         const blob = unfilledBlobCells[cell.color]
         blob.delete(position)
-        for (const pos of blob) {
-            BruteSolver.markAsNotQueen(board, pos)
+        for (const pos of blob.values()) {
+            BruteSolver.markCellAsNotQueen(board.getCell(pos))
         }
         blob.clear()
 
@@ -72,22 +72,26 @@ export class BruteSolver {
      * @param board A square board with enough colors and properly connected blobs.
      */
     findUniqueSolution(board: Board, blobs: ConnectBlobsResponse): BoardSolution {
+        const size = board.cells.length
         const unfilledBlobCells: ConnectBlobsResponse['blobsByColor'] = []
         for (const blob of blobs.blobsByColor) {
-            unfilledBlobCells.push(new Set(blob))
+            unfilledBlobCells.push(new Map(blob))
         }
+
+        // TODO Loop.
 
         // Check if any blobs have only one available cell.
         for (const blob of unfilledBlobCells) {
             if (blob.size === 1) {
-                const position = blob.values().next().value!
-                const cell = board.getCell(position)
+                const position = blob.keys().next().value!
+                const coords = blob.values().next().value!
+                const cell = board.getCell(coords)
                 BruteSolver.markAsQueen(cell, board, position, unfilledBlobCells)
             }
         }
 
         // Check if any rows have only one available cell.
-        for (let row = 0; row < board.cells.length; ++row) {
+        for (let row = 0; row < size; ++row) {
             // TODO Optimize if we don't need all and just try to get the one.
             const availableCells = board.cells[row].filter(cell => cell.value === CellValue.Blank)
             if (availableCells.length === 1) {
@@ -104,19 +108,21 @@ export class BruteSolver {
                 }
             }
             */
+        }
 
-            // Check if any columns have only one available cell.
-            for (let column = 0; column < board.cells[row].length; ++column) {
-                // TODO Optimize if we don't need all and just try to get the one.
-                const availableCells = board.cells.map(row => row[column]).filter(cell => cell.value === CellValue.Blank)
-                if (availableCells.length === 1) {
-                    const cell = availableCells[0]
-                    BruteSolver.markAsQueen(cell, board, cell.getIndexablePosition(), unfilledBlobCells)
-                }
-                /* Don't need because we'll check for straight-like blobs.
-                // TODO Check for just 2 or 3 cells sequentially and mark the adjacent cells as not having a queen.
-                */
+        // Check if any columns have only one available cell.
+        for (let column = 0; column < size; ++column) {
+            // TODO Optimize if we don't need all and just try to get the one.
+            const availableCells = board.cells
+                .map(row => row[column])
+                .filter(cell => cell.value === CellValue.Blank)
+            if (availableCells.length === 1) {
+                const cell = availableCells[0]
+                BruteSolver.markAsQueen(cell, board, cell.getIndexablePosition(), unfilledBlobCells)
             }
+            /* Don't need because we'll check for straight-like blobs.
+            // TODO Check for just 2 or 3 cells sequentially and mark the adjacent cells as not having a queen.
+            */
         }
 
         // Check if any blobs only have cells in one row.

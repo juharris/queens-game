@@ -1,4 +1,5 @@
 import { Cell, CellPosition } from '.'
+import { CellCoordinates } from './cell'
 
 export class Board {
     constructor(
@@ -11,7 +12,11 @@ export class Board {
         }
     }
 
-    public getCell(position: CellPosition): Cell {
+    public getCell(position: CellCoordinates): Cell {
+        return this.cells[position[0]][position[1]]
+    }
+
+    public getCellByPosition(position: CellPosition): Cell {
         const pos = position.split(',').map(Number)
         return this.cells[pos[0]][pos[1]]
     }

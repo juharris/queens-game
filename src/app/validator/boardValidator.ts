@@ -1,4 +1,5 @@
 import { Board, CellPosition } from '../board'
+import { CellCoordinates } from '../board/cell'
 import { BoardSolution, BruteSolver } from '../solver'
 
 export enum InvalidBoardReason {
@@ -16,7 +17,7 @@ export class BoardValidatorResponse {
 
 export class ConnectBlobsResponse {
     constructor(
-        public blobsByColor: Set<CellPosition>[],
+        public blobsByColor: Map<CellPosition, CellCoordinates>[],
     ) { }
 }
 
@@ -26,23 +27,23 @@ export class BoardValidator {
     static areBlobsConnected(board: Board): ConnectBlobsResponse | undefined {
         const size = board.cells.length
         const traversedColors = new Set<number>()
-        const blobsByColor: Set<CellPosition>[] = []
+        const blobsByColor: ConnectBlobsResponse['blobsByColor'] = []
         for (let i = 0; i < size; ++i) {
-            blobsByColor.push(new Set<CellPosition>())
+            blobsByColor.push(new Map())
         }
         const isInBlob: boolean[][] = []
         for (let i = 0; i < size; ++i) {
             isInBlob.push(new Array(size).fill(false))
         }
 
-        const dfs = (i: number, j: number, color: number, blob: Set<CellPosition>): void => {
+        const dfs = (i: number, j: number, color: number, blob: ConnectBlobsResponse['blobsByColor'][0]): void => {
             if (i < 0 || i >= size || j < 0 || j >= size || isInBlob[i][j] || board.cells[i][j].color !== color) {
                 return
             }
 
             // The cell has the same color and it's not in a blob yet.
             isInBlob[i][j] = true
-            blob.add(`${i},${j}`)
+            blob.set(`${i},${j}`, [i, j])
 
             dfs(i - 1, j, color, blob)
             dfs(i + 1, j, color, blob)

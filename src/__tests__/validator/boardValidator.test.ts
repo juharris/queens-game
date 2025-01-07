@@ -1,4 +1,5 @@
-import { Board, Cell } from '../../app/board'
+import { CellCoordinates } from '@/app/board/cell'
+import { Board, Cell, CellPosition } from '../../app/board'
 import { BoardValidator, InvalidBoardReason } from '../../app/validator/boardValidator'
 
 describe("BoardValidator", () => {
@@ -12,9 +13,9 @@ describe("BoardValidator", () => {
             const blobs = BoardValidator.areBlobsConnected(board)
             expect(blobs).toBeDefined()
             expect(blobs!.blobsByColor).toStrictEqual([
-                new Set(['0,0', '0,1', '1,1']),
-                new Set(['0,2', '1,2']),
-                new Set(['1,0', '2,0', '2,1', '2,2']),
+                new Map<CellPosition, CellCoordinates>([['0,0', [0, 0]], ['0,1', [0, 1]], ['1,1', [1, 1]]]),
+                new Map<CellPosition, CellCoordinates>([['0,2', [0, 2]], ['1,2', [1, 2]]]),
+                new Map<CellPosition, CellCoordinates>([['1,0', [1, 0]], ['2,0', [2, 0]], ['2,1', [2, 1]], ['2,2', [2, 2]]]),
             ])
             expect(BoardValidator.isBoardValid(board).invalidReason).toBe(InvalidBoardReason.NoUniqueSolution)
 
