@@ -1,8 +1,6 @@
 import numpy as np
 from numpy.typing import NDArray
 
-import json
-
 
 class Board:
     @classmethod
@@ -16,4 +14,4 @@ class Board:
         self.colors = colors
 
     def __str__(self) -> str:
-        return json.dumps(self.colors.tolist())
+        return str(self.colors)

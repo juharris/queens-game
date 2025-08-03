@@ -12,9 +12,9 @@ def main():
     board.colors[2, :] = 2
     board.colors[3, :] = 3
     solver = Solver(board)
-    print(f"Board: {board}")
+    print(f"Board:\n{board}")
     solution = solver.solve()
-    print(f"solution: {solution}")
+    print(f"solution:\n{solution}")
 
 
 if __name__ == "__main__":
