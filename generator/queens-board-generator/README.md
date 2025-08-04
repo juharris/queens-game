@@ -7,3 +7,9 @@ Install `uv`: https://docs.astral.sh/uv/getting-started/installation/
 ```shell
 uv run main.py
 ```
+
+# Testing
+
+```shell
+uv run pytest
+```
