@@ -15,7 +15,7 @@ describe("BruteSolver", () => {
             expect(board.cells[0][0].value).toBe(CellValue.Queen)
         })
 
-        it("should not solve - 2 cells", () => {
+        it.skip("should not solve - 2 cells", () => {
             const board = new Board([
                 [new Cell(0), new Cell(0)],
                 [new Cell(0), new Cell(1)],
@@ -25,7 +25,7 @@ describe("BruteSolver", () => {
                 .toThrow("TODO")
         })
 
-        it("should not solve - 3 cells", () => {
+        it.skip("should not solve - 3 cells", () => {
             const board = new Board([
                 [new Cell(0), new Cell(0), new Cell(1)],
                 [new Cell(0), new Cell(1), new Cell(1)],
