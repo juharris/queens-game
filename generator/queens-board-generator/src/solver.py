@@ -1,5 +1,7 @@
+from collections import Counter
 from dataclasses import dataclass
 from enum import Enum
+from typing import Iterable
 
 import numpy as np
 from numpy.typing import NDArray
@@ -13,6 +15,7 @@ class SolutionLabel(Enum):
     QUEEN = 2
 
 
+Position = tuple[int, int]
 Solution = NDArray[np.int8]
 
 
@@ -36,17 +39,18 @@ class Solver:
         result = np.zeros_like(self.board.colors, dtype=SolutionLabel)
         while not self._is_solved():
             changes = self.check_easys(result)
-            if not changes.was_changed_made:
+            changes2 = self.check_blocking_colors(result)
+            if not changes.was_changed_made and not changes2.was_changed_made:
                 raise NoChangesMade("Possible infinite loop.")
 
         return result
 
     def _init_groups(self):
         self.groups: dict[np.int8,
-                          set[tuple[int, int]]] = dict()
+                          set[Position]] = dict()
         for i, row in enumerate(self.board.colors):
             for j, color in enumerate(row):
-                positions: set[tuple[int, int]
+                positions: set[Position
                                ] | None = self.groups.get(color, None)
                 if positions is None:
                     self.groups[color] = positions = set()
@@ -54,6 +58,23 @@ class Solver:
 
     def _is_solved(self):
         return len(self.groups) == 0
+
+    def check_blocking_colors(self, solution: Solution) -> Changes:
+        was_change_made = False
+
+        # For each cell that is unknown, check if it blocks all of a color.
+        for i, row in enumerate(solution):
+            for j, sol in enumerate(row):
+                if sol == SolutionLabel.UNKNOWN.value:
+                    # Check if any colors are completely covered by targets.
+                    targets = self.get_target_positions(solution, i, j)
+                    color_counts = self.get_color_counts(targets)
+                    for color, count in color_counts.items():
+                        if len(self.groups[color]) <= count:
+                            self.set_not_queen(solution, i, j)
+                            was_change_made = True
+
+        return Changes(was_change_made)
 
     def check_easys(self, solution: Solution) -> Changes:
         was_change_made = False
@@ -94,7 +115,39 @@ class Solver:
 
         return Changes(was_change_made)
 
-    def set_queen(self, solution: Solution, position: tuple[int, int]):
+    def _generate_target_positions(self, solution: Solution, row: int, col: int):
+        """Finds the positions that this `position` attacks."""
+        size = solution.shape[0]
+        # Get the row.
+        for x in range(size):
+            if x != row and solution[x, col] == SolutionLabel.UNKNOWN.value:
+                yield (x, col)
+        # Get the column.
+        for y in range(size):
+            if y != col and solution[row, y] == SolutionLabel.UNKNOWN.value:
+                yield (row, y)
+        if row > 0:
+            if col > 0 and solution[row - 1, col-1] == SolutionLabel.UNKNOWN.value:
+                yield (row-1, col-1)
+            if col + 1 < size and solution[row - 1, col+1] == SolutionLabel.UNKNOWN.value:
+                yield (row-1, col+1)
+        if row + 1 < size:
+            if col > 0 and solution[row + 1, col-1] == SolutionLabel.UNKNOWN.value:
+                yield (row+1, col-1)
+            if col + 1 < size and solution[row+1, col+1] == SolutionLabel.UNKNOWN.value:
+                yield (row+1, col+1)
+
+    def get_color_counts(self, targets: Iterable[Position]) -> Counter[np.int8]:
+        result: Counter[np.int8] = Counter()
+        for pos in targets:
+            result[self.board.colors[pos]] += 1
+        return result
+
+    def get_target_positions(self, solution: Solution, row: int, col: int) -> list[Position]:
+        """Finds the positions that this `position` attacks."""
+        return list(self._generate_target_positions(solution, row, col))
+
+    def set_queen(self, solution: Solution, position: Position):
         row, col = position
         size = solution.shape[0]
         # Clear rows, colums, adjacent.
@@ -122,7 +175,7 @@ class Solver:
         solution[row, col] = SolutionLabel.NOT_QUEEN.value
         self._remove_from_groups((row, col))
 
-    def _remove_from_groups(self, position: tuple[int, int]):
+    def _remove_from_groups(self, position: Position):
         color = self.board.colors[position]
         try:
             positions_for_color = self.groups[color]
