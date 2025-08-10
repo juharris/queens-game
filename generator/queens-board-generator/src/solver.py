@@ -16,6 +16,15 @@ class SolutionLabel(Enum):
 Solution = NDArray[np.int8]
 
 
+class NoChangesMade(Exception):
+    pass
+
+
+@dataclass
+class Changes:
+    was_changed_made: bool
+
+
 @dataclass
 class Solver:
     board: Board
@@ -26,7 +35,9 @@ class Solver:
     def solve(self) -> Solution:
         result = np.zeros_like(self.board.colors, dtype=SolutionLabel)
         while not self._is_solved():
-            self.check_easys(result)
+            changes = self.check_easys(result)
+            if not changes.was_changed_made:
+                raise NoChangesMade("Possible infinite loop.")
 
         return result
 
@@ -44,19 +55,21 @@ class Solver:
     def _is_solved(self):
         return len(self.groups) == 0
 
-    def check_easys(self, solution: Solution):
+    def check_easys(self, solution: Solution) -> Changes:
+        was_change_made = False
         # Check rows for only 1 unknown.
         for i, row in enumerate(solution):
             pos = None
             for j, sol in enumerate(row):
                 if sol == SolutionLabel.UNKNOWN.value:
                     if pos is not None:
+                        # There are at least 2 unknowns in this column.
                         pos = None
                         break
                     pos = (i, j)
             if pos is not None:
+                was_change_made = True
                 self.set_queen(solution, pos)
-                break
 
         # Check columns for only 1 unknown.
         for j, col in enumerate(solution.transpose()):
@@ -64,19 +77,22 @@ class Solver:
             for i, sol in enumerate(col):
                 if sol == SolutionLabel.UNKNOWN.value:
                     if pos is not None:
+                        # There are at least 2 unknowns in this row.
                         pos = None
                         break
                     pos = (i, j)
             if pos is not None:
+                was_change_made = True
                 self.set_queen(solution, pos)
-                break
 
         # Check colors for only 1 value.
         for _color, positions in tuple(self.groups.items()):
             if len(positions) == 1:
                 pos = next(iter(positions))
+                was_change_made = True
                 self.set_queen(solution, pos)
-                break
+
+        return Changes(was_change_made)
 
     def set_queen(self, solution: Solution, position: tuple[int, int]):
         row, col = position
