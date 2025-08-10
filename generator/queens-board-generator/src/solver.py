@@ -37,9 +37,12 @@ class Solver:
 
     def solve(self) -> Solution:
         result = np.zeros_like(self.board.colors, dtype=SolutionLabel)
+        difficulty = 0
         while not self._is_solved():
             changes = self.check_easys(result)
             changes2 = self.check_blocking_colors(result)
+            if changes2.was_changed_made:
+                difficulty = max(difficulty, 1)
             if not changes.was_changed_made and not changes2.was_changed_made:
                 raise NoChangesMade("Possible infinite loop.")
 
