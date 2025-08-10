@@ -25,7 +25,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to see the p
 npm run test:ci
 ```
 
-To re-run tests on file changes, run:
+To automatically re-run tests when files change, run:
 ```bash
 npm run test
 ```

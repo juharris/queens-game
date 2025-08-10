@@ -1,0 +1,1 @@
+export { BoardValidator } from './boardValidator'
