@@ -40,10 +40,13 @@ class Solver:
         difficulty = 0
         while not self._is_solved():
             changes = self.check_easys(result)
-            changes2 = self.check_blocking_colors(result)
-            if changes2.was_changed_made:
+            if changes.was_changed_made:
+                # Try to look for easy changes.
+                continue
+            changes = self.check_blocking_colors(result)
+            if changes.was_changed_made:
                 difficulty = max(difficulty, 1)
-            if not changes.was_changed_made and not changes2.was_changed_made:
+            else:
                 raise NoChangesMade("Possible infinite loop.")
 
         return result
@@ -76,6 +79,7 @@ class Solver:
                         if len(self.groups[color]) <= count:
                             self.set_not_queen(solution, i, j)
                             was_change_made = True
+                            break
 
         return Changes(was_change_made)
 
