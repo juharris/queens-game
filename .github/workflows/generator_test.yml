@@ -1,0 +1,39 @@
+name: "[Test] Generator"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # Following guidance from https://docs.astral.sh/uv/guides/integration/github/#setting-up-python
+    - uses: actions/setup-python@v5
+      name: "[Python] Setup"
+      with:
+        cache: pip
+        python-version-file: "./generator/queens-board-generator/.python-version"
+    - name: "Install uv"
+      uses: astral-sh/setup-uv@v6
+      with:
+        version: "0.8.7"
+        enable-cache: true
+    - name: Install dependencies
+      run: |
+        uv sync --locked --all-extras --dev
+      working-directory: ./generator/queens-board-generator
+    - name: Test with pytest
+      run: |
+        uv run pytest tests
+      working-directory: ./generator/queens-board-generator
