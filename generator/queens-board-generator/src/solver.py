@@ -55,6 +55,11 @@ class Solver:
                 difficulty = max(difficulty, 1)
                 continue
 
+            changes = self.check_color_runs(solution_board)
+            if changes.was_changed_made:
+                difficulty = max(difficulty, 2)
+                continue
+
             if not changes.was_changed_made:
                 raise NoChangesMade("Possible infinite loop.")
 
@@ -90,6 +95,21 @@ class Solver:
                             was_change_made = True
                             break
 
+        return Changes(was_change_made)
+
+    def check_color_runs(self, solution: SolutionBoard) -> Changes:
+        was_change_made = False
+        size = solution.shape[0]
+        # TODO Check if any colors are only in 2 rows, 3 rows, etc.
+        # Check adjacent rows first.
+        for width in range(2, size - 2):
+            for start_row in range(size-width):
+                # FIXME Just get ones that are unknown.
+                color_counts = Counter(
+                    self.board.colors[start_row:start_row+width, :].flatten())
+                # TODO If any `width` number of colors have counts the same as self.groups, then label positions for other colors as not queens.
+
+        # Then columns.
         return Changes(was_change_made)
 
     def check_easys(self, solution: SolutionBoard) -> Changes:
