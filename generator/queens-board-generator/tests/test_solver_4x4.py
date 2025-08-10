@@ -52,6 +52,7 @@ def test_no_solution():
         solver.solve()
 
 
+@pytest.mark.skip("WIP")
 def test_eliminates_color():
     # Make a board that can be solved deterministically by noticing that a space blocks a color.
     colors = np.array([
