@@ -16,7 +16,13 @@ class SolutionLabel(Enum):
 
 
 Position = tuple[int, int]
-Solution = NDArray[np.int8]
+SolutionBoard = NDArray[np.int8]
+
+
+@dataclass
+class Solution:
+    board: SolutionBoard
+    difficulty: int
 
 
 class NoChangesMade(Exception):
@@ -36,20 +42,23 @@ class Solver:
         self._init_groups()
 
     def solve(self) -> Solution:
-        result = np.zeros_like(self.board.colors, dtype=SolutionLabel)
+        solution_board = np.zeros_like(self.board.colors, dtype=SolutionLabel)
         difficulty = 0
         while not self._is_solved():
-            changes = self.check_easys(result)
+            changes = self.check_easys(solution_board)
             if changes.was_changed_made:
-                # Try to look for easy changes.
+                # Try to look for more easy changes.
                 continue
-            changes = self.check_blocking_colors(result)
+
+            changes = self.check_blocking_colors(solution_board)
             if changes.was_changed_made:
                 difficulty = max(difficulty, 1)
-            else:
+                continue
+
+            if not changes.was_changed_made:
                 raise NoChangesMade("Possible infinite loop.")
 
-        return result
+        return Solution(solution_board, difficulty)
 
     def _init_groups(self):
         self.groups: dict[np.int8,
@@ -65,7 +74,7 @@ class Solver:
     def _is_solved(self):
         return len(self.groups) == 0
 
-    def check_blocking_colors(self, solution: Solution) -> Changes:
+    def check_blocking_colors(self, solution: SolutionBoard) -> Changes:
         was_change_made = False
 
         # For each cell that is unknown, check if it blocks all of a color.
@@ -83,7 +92,7 @@ class Solver:
 
         return Changes(was_change_made)
 
-    def check_easys(self, solution: Solution) -> Changes:
+    def check_easys(self, solution: SolutionBoard) -> Changes:
         was_change_made = False
         # Check rows for only 1 unknown.
         for i, row in enumerate(solution):
@@ -122,7 +131,7 @@ class Solver:
 
         return Changes(was_change_made)
 
-    def _generate_target_positions(self, solution: Solution, row: int, col: int):
+    def _generate_target_positions(self, solution: SolutionBoard, row: int, col: int):
         """Finds the positions that this `position` attacks."""
         size = solution.shape[0]
         # Get the row.
@@ -150,11 +159,11 @@ class Solver:
             result[self.board.colors[pos]] += 1
         return result
 
-    def get_target_positions(self, solution: Solution, row: int, col: int) -> list[Position]:
+    def get_target_positions(self, solution: SolutionBoard, row: int, col: int) -> list[Position]:
         """Finds the positions that this `position` attacks."""
         return list(self._generate_target_positions(solution, row, col))
 
-    def set_queen(self, solution: Solution, position: Position):
+    def set_queen(self, solution: SolutionBoard, position: Position):
         row, col = position
         size = solution.shape[0]
         # Clear rows, colums, adjacent.
@@ -178,7 +187,7 @@ class Solver:
         solution[position] = SolutionLabel.QUEEN.value
         # It is already removed from groups from the loops above.
 
-    def set_not_queen(self, solution: Solution, row: int, col: int):
+    def set_not_queen(self, solution: SolutionBoard, row: int, col: int):
         solution[row, col] = SolutionLabel.NOT_QUEEN.value
         self._remove_from_groups((row, col))
 

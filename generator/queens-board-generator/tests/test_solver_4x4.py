@@ -23,7 +23,8 @@ def test_simple():
     expected_solution[1, 3] = SolutionLabel.QUEEN.value
     expected_solution[2, 0] = SolutionLabel.QUEEN.value
     expected_solution[3, 2] = SolutionLabel.QUEEN.value
-    assert np.array_equal(expected_solution, solution)
+    assert np.array_equal(expected_solution, solution.board)
+    assert 0 == solution.difficulty
 
 
 def test_non_deterministic():
@@ -70,4 +71,5 @@ def test_eliminates_color():
     expected_solution[1, 3] = SolutionLabel.QUEEN.value
     expected_solution[2, 0] = SolutionLabel.QUEEN.value
     expected_solution[3, 2] = SolutionLabel.QUEEN.value
-    assert np.array_equal(expected_solution, solution)
+    assert np.array_equal(expected_solution, solution.board)
+    assert 1 == solution.difficulty

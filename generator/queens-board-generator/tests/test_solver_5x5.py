@@ -24,4 +24,5 @@ def test_simple():
     expected_solution[2, 0] = SolutionLabel.QUEEN.value
     expected_solution[3, 2] = SolutionLabel.QUEEN.value
     expected_solution[4, 4] = SolutionLabel.QUEEN.value
-    assert np.array_equal(expected_solution, solution)
+    assert np.array_equal(expected_solution, solution.board)
+    assert 0 == solution.difficulty
